@@ -26,7 +26,9 @@ class UserManager(BaseUserManager):
             password = password,
             nickname = nickname
         )
-        user.is_admin = True
+        # user.is_admin = True
+        user.is_superuser = True
+        user.is_staff = True
         user.save(using=self.db)
         return user
 
@@ -36,15 +38,15 @@ class User(AbstractUser):
     nickname = models.CharField(max_length=100, null=False, blank=False, unique=True)
 
     is_active = models.BooleanField(default=True)
-    is_admin = models.BooleanField(default=False)
+    is_staff = models.BooleanField(default=False)
 
     # 헬퍼 클래스 사용
     objects = UserManager()
 
-    # username field를 nickname으로 설정
-    USERNAME_FIELD = 'nickname'
+    # username field를 email으로 설정
+    USERNAME_FIELD = 'email'
     # 필수로 작성해야하는 field
-    REQUIRED_FIELDS = ['email', 'nikcname']
+    REQUIRED_FIELDS = ['nickname']
 
     def __str__(self):
         return self.nickname
@@ -54,3 +56,7 @@ class User(AbstractUser):
     
     def has_module_perms(self, app_label):
         return True
+    
+    # @property
+    # def is_staff(self):
+    #     return self.is_admin

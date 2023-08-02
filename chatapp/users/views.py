@@ -26,3 +26,22 @@ class SignUp(APIView):
             user = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
+# 로그인
+@permission_classes([AllowAny])
+class Login(APIView):
+
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+
+        user = authenticate(email=email, password=password)
+        if user is None:
+            return Response({'message': '아이디 또는 비밀번호가 일치하지 않습니다.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        refresh = RefreshToken.for_user(user)
+        update_last_login(None, user)
+
+        return Response({'refresh_token': str(refresh),'access_token': str(refresh.access_token)},
+                        status=status.HTTP_200_OK)
+    
